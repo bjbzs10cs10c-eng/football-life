@@ -183,6 +183,8 @@ MATCH_REPUTATION_GAIN = 2
 EVENT_TYPES = ["training", "match", "career"]
 EVENT_TRIGGER_CHANCE = 0.15     # 每次行动触发事件的概率
 EVENT_DATA_FILE = "data/events.json"
+# effect 表达式中允许的非属性特殊键（属性键 = ALL_ATTRIBUTES）
+EVENT_SPECIAL_EFFECT_KEYS = ["condition", "money", "reputation"]
 
 # --------------------------------------------------------------------------
 # 球队与转会（PRD §11 / TDD §11，门槛全部配置化）
@@ -194,6 +196,9 @@ CLUB_TIER_NAMES_ZH = {
     "TOP_LEAGUE": "顶级联赛",
     "ELITE": "欧洲豪门",
 }
+# 俱乐部数值范围（TDD §4.3：strength / facility / salary_level）
+CLUB_VALUE_MIN = 1
+CLUB_VALUE_MAX = 100
 # 各等级转入门槛（TDD 默认：豪门 Overall≥80 且声望≥70）
 TRANSFER_OFFER_RULES = {
     "AMATEUR": {"min_overall": 50, "min_reputation": 20},
@@ -277,6 +282,16 @@ def validate_config(settings=None):
     for tier in s["TRANSFER_OFFER_RULES"]:
         if tier not in s["CLUB_TIERS"]:
             errors.append(f"转入门槛包含未定义的球队等级: {tier}")
+
+    if s["CLUB_VALUE_MIN"] > s["CLUB_VALUE_MAX"]:
+        errors.append("CLUB_VALUE_MIN 大于 CLUB_VALUE_MAX")
+
+    special_keys = s["EVENT_SPECIAL_EFFECT_KEYS"]
+    if len(set(special_keys)) != len(special_keys):
+        errors.append("EVENT_SPECIAL_EFFECT_KEYS 存在重复键")
+    overlap = set(special_keys) & set(s["ALL_ATTRIBUTES"])
+    if overlap:
+        errors.append(f"EVENT_SPECIAL_EFFECT_KEYS 与属性键冲突: {overlap}")
 
     if errors:
         raise ValueError("配置校验失败:\n" + "\n".join(errors))

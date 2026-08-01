@@ -1,0 +1,290 @@
+[
+  {
+    "name": "皇家马德里",
+    "league": "西甲",
+    "tier": "ELITE",
+    "strength": 92,
+    "facility": 96,
+    "salary_level": 95
+  },
+  {
+    "name": "巴塞罗那",
+    "league": "西甲",
+    "tier": "ELITE",
+    "strength": 90,
+    "facility": 92,
+    "salary_level": 92
+  },
+  {
+    "name": "马德里竞技",
+    "league": "西甲",
+    "tier": "ELITE",
+    "strength": 88,
+    "facility": 85,
+    "salary_level": 84
+  },
+  {
+    "name": "曼彻斯特城",
+    "league": "英超",
+    "tier": "ELITE",
+    "strength": 92,
+    "facility": 95,
+    "salary_level": 95
+  },
+  {
+    "name": "利物浦",
+    "league": "英超",
+    "tier": "ELITE",
+    "strength": 91,
+    "facility": 90,
+    "salary_level": 90
+  },
+  {
+    "name": "阿森纳",
+    "league": "英超",
+    "tier": "ELITE",
+    "strength": 89,
+    "facility": 90,
+    "salary_level": 89
+  },
+  {
+    "name": "拜仁慕尼黑",
+    "league": "德甲",
+    "tier": "ELITE",
+    "strength": 91,
+    "facility": 94,
+    "salary_level": 93
+  },
+  {
+    "name": "多特蒙德",
+    "league": "德甲",
+    "tier": "ELITE",
+    "strength": 86,
+    "facility": 87,
+    "salary_level": 84
+  },
+  {
+    "name": "巴黎圣日耳曼",
+    "league": "法甲",
+    "tier": "ELITE",
+    "strength": 91,
+    "facility": 93,
+    "salary_level": 94
+  },
+  {
+    "name": "国际米兰",
+    "league": "意甲",
+    "tier": "ELITE",
+    "strength": 89,
+    "facility": 88,
+    "salary_level": 87
+  },
+  {
+    "name": "上海海港",
+    "league": "中超",
+    "tier": "TOP_LEAGUE",
+    "strength": 78,
+    "facility": 72,
+    "salary_level": 70
+  },
+  {
+    "name": "上海申花",
+    "league": "中超",
+    "tier": "TOP_LEAGUE",
+    "strength": 76,
+    "facility": 70,
+    "salary_level": 68
+  },
+  {
+    "name": "成都蓉城",
+    "league": "中超",
+    "tier": "TOP_LEAGUE",
+    "strength": 77,
+    "facility": 71,
+    "salary_level": 69
+  },
+  {
+    "name": "北京国安",
+    "league": "中超",
+    "tier": "TOP_LEAGUE",
+    "strength": 75,
+    "facility": 74,
+    "salary_level": 72
+  },
+  {
+    "name": "山东泰山",
+    "league": "中超",
+    "tier": "TOP_LEAGUE",
+    "strength": 74,
+    "facility": 73,
+    "salary_level": 70
+  },
+  {
+    "name": "托特纳姆热刺",
+    "league": "英超",
+    "tier": "TOP_LEAGUE",
+    "strength": 84,
+    "facility": 82,
+    "salary_level": 80
+  },
+  {
+    "name": "阿斯顿维拉",
+    "league": "英超",
+    "tier": "TOP_LEAGUE",
+    "strength": 83,
+    "facility": 79,
+    "salary_level": 78
+  },
+  {
+    "name": "比利亚雷亚尔",
+    "league": "西甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 82,
+    "facility": 76,
+    "salary_level": 74
+  },
+  {
+    "name": "斯图加特",
+    "league": "德甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 80,
+    "facility": 74,
+    "salary_level": 70
+  },
+  {
+    "name": "汉堡",
+    "league": "德甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 74,
+    "facility": 66,
+    "salary_level": 60
+  },
+  {
+    "name": "那不勒斯",
+    "league": "意甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 84,
+    "facility": 81,
+    "salary_level": 79
+  },
+  {
+    "name": "科莫",
+    "league": "意甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 76,
+    "facility": 70,
+    "salary_level": 66
+  },
+  {
+    "name": "摩纳哥",
+    "league": "法甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 82,
+    "facility": 80,
+    "salary_level": 76
+  },
+  {
+    "name": "朗斯",
+    "league": "法甲",
+    "tier": "TOP_LEAGUE",
+    "strength": 79,
+    "facility": 72,
+    "salary_level": 68
+  },
+  {
+    "name": "西汉姆联",
+    "league": "英冠",
+    "tier": "LOW_PRO",
+    "strength": 72,
+    "facility": 70,
+    "salary_level": 68
+  },
+  {
+    "name": "狼队",
+    "league": "英冠",
+    "tier": "LOW_PRO",
+    "strength": 70,
+    "facility": 68,
+    "salary_level": 64
+  },
+  {
+    "name": "谢菲尔德联",
+    "league": "英冠",
+    "tier": "LOW_PRO",
+    "strength": 65,
+    "facility": 60,
+    "salary_level": 56
+  },
+  {
+    "name": "诺维奇",
+    "league": "英冠",
+    "tier": "LOW_PRO",
+    "strength": 62,
+    "facility": 58,
+    "salary_level": 54
+  },
+  {
+    "name": "长春亚泰",
+    "league": "中甲",
+    "tier": "LOW_PRO",
+    "strength": 58,
+    "facility": 55,
+    "salary_level": 50
+  },
+  {
+    "name": "梅州客家",
+    "league": "中甲",
+    "tier": "LOW_PRO",
+    "strength": 55,
+    "facility": 50,
+    "salary_level": 46
+  },
+  {
+    "name": "广东广州豹",
+    "league": "中甲",
+    "tier": "LOW_PRO",
+    "strength": 56,
+    "facility": 52,
+    "salary_level": 48
+  },
+  {
+    "name": "大连鲲城",
+    "league": "中甲",
+    "tier": "LOW_PRO",
+    "strength": 54,
+    "facility": 48,
+    "salary_level": 44
+  },
+  {
+    "name": "湖北青年星",
+    "league": "中乙",
+    "tier": "AMATEUR",
+    "strength": 48,
+    "facility": 40,
+    "salary_level": 35
+  },
+  {
+    "name": "厦门飞鹭",
+    "league": "中乙",
+    "tier": "AMATEUR",
+    "strength": 46,
+    "facility": 38,
+    "salary_level": 33
+  },
+  {
+    "name": "贵州贵阳竞技",
+    "league": "中乙",
+    "tier": "AMATEUR",
+    "strength": 45,
+    "facility": 37,
+    "salary_level": 32
+  },
+  {
+    "name": "江西庐山",
+    "league": "中乙",
+    "tier": "AMATEUR",
+    "strength": 44,
+    "facility": 36,
+    "salary_level": 30
+  }
+]
