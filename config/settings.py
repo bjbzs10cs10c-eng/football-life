@@ -129,6 +129,8 @@ TRAINING_TYPES = {
     },
 }
 REST_CONDITION_RESTORE = 30
+# 受伤后的额外体力惩罚（PRD §7.2 体能训练“受伤概率增加”的最小实现）
+INJURY_CONDITION_PENALTY = 25
 
 # --------------------------------------------------------------------------
 # 成长系统（TDD §6）
@@ -270,6 +272,13 @@ def validate_config(settings=None):
                 errors.append(f"训练 {name} 引用了未定义属性: {attr}")
         if cfg["gain_min"] > cfg["gain_max"]:
             errors.append(f"训练 {name} 的 gain_min 大于 gain_max")
+        if cfg["condition_cost"] < 0:
+            errors.append(f"训练 {name} 的 condition_cost 不能为负")
+        if not (0 <= cfg["injury_chance_percent"] <= 100):
+            errors.append(f"训练 {name} 的 injury_chance_percent 须在 0-100")
+
+    if s["INJURY_CONDITION_PENALTY"] < 0:
+        errors.append("INJURY_CONDITION_PENALTY 不能为负")
 
     weight_sum = (
         s["OVERALL_WEIGHT_TECHNICAL"]
