@@ -128,7 +128,7 @@ TRAINING_TYPES = {
         "attributes": ["decision"],
         "gain_min": 1,
         "gain_max": 3,
-        "condition_cost": 10,
+        "condition_cost": 15,
         "injury_chance_percent": 0,
     },
     "REST": {
@@ -140,7 +140,7 @@ TRAINING_TYPES = {
         "injury_chance_percent": 0,
     },
 }
-REST_CONDITION_RESTORE = 30
+REST_CONDITION_RESTORE = 45
 # 受伤后的额外体力惩罚（PRD §7.2 体能训练“受伤概率增加”的最小实现）
 INJURY_CONDITION_PENALTY = 25
 
@@ -155,6 +155,8 @@ GROWTH_AGE_BRACKETS = [
     (29, None, 0.25),
 ]
 GROWTH_ROUND_STEP = 0.5         # 成长值按 0.5 粒度取整（支持小数累加）
+# 全局成长速率（平衡旋钮，0~1）：越小成长越慢，调参只需改这里
+GROWTH_RATE = 0.35
 
 # --------------------------------------------------------------------------
 # 比赛系统（TDD §8，公式数值全部配置化）
@@ -311,6 +313,9 @@ def validate_config(settings=None):
         errors.append("ASSIST_CHANCE_PERCENT 须在 0-100")
     if s["OPPONENT_GOAL_FACTOR"] <= 0:
         errors.append("OPPONENT_GOAL_FACTOR 必须为正数")
+
+    if not (0 < s["GROWTH_RATE"] <= 1):
+        errors.append("GROWTH_RATE 须在 (0,1] 区间")
 
     retire_rules = s["RETIRE_EVAL_RULES"]
     if not retire_rules:

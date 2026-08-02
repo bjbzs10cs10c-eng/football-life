@@ -56,32 +56,36 @@ class TestAgeFactor:
 
 class TestGrowthAmount:
     def test_seventeen_with_high_professionalism(self):
-        # 基础 2 × 职业态度 0.8 × 年龄 1.0 = 1.6 -> 0.5 粒度 1.5 -> +2
-        assert g.growth_amount(17, 80, 2) == 2
+        # 2×0.8×1.0×0.35 = 0.56 -> 四舍五入 +1
+        assert g.growth_amount(17, 80, 2) == 1
 
     def test_thirty_with_high_professionalism(self):
-        # 基础 2 × 0.8 × 0.25 = 0.4 -> 至少 +1
-        assert g.growth_amount(30, 80, 2) == 1
+        # 2×0.8×0.25×0.35 = 0.14 -> 不足半档 -> +0
+        assert g.growth_amount(30, 80, 2) == 0
 
     def test_zero_base_gives_no_growth(self):
         assert g.growth_amount(17, 80, 0) == 0
 
     def test_higher_professionalism_grows_more(self):
-        low = g.growth_amount(17, 40, 3)
+        low = g.growth_amount(17, 20, 3)
         high = g.growth_amount(17, 100, 3)
         assert high >= low
         assert high > low
 
     def test_younger_grows_more_than_older(self):
-        young = g.growth_amount(17, 80, 3)
-        old = g.growth_amount(30, 80, 3)
+        young = g.growth_amount(17, 100, 3)
+        old = g.growth_amount(35, 100, 3)
         assert young >= old
 
     def test_rounding_to_half_step(self):
-        # 基础 3 × 1.0 × 1.0 = 3.0 -> +3
-        assert g.growth_amount(17, 100, 3) == 3
-        # 基础 3 × 0.8 × 1.0 = 2.4 -> 2.5 -> +3
-        assert g.growth_amount(17, 80, 3) == 3
+        # 3×1.0×1.0×0.35 = 1.05 -> 1.0 -> +1
+        assert g.growth_amount(17, 100, 3) == 1
+        # 3×0.6×1.0×0.35 = 0.63 -> 0.5 -> +1
+        assert g.growth_amount(17, 60, 3) == 1
+        # 3×0.4×1.0×0.35 = 0.42 -> 不足半档 -> +0
+        assert g.growth_amount(17, 40, 3) == 0
+        # 3×0.2×1.0×0.35 = 0.21 -> 0 -> +0
+        assert g.growth_amount(17, 20, 3) == 0
 
 
 class TestTrainingTypes:

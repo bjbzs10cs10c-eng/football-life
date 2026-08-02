@@ -1,10 +1,11 @@
 """成长系统（B6）。
 
-TDD §6：增长值 = 基础训练效果 × 职业态度系数 × 年龄系数。
+TDD §6：增长值 = 基础训练效果 × 职业态度系数 × 年龄系数 × 全局成长速率。
 - 职业态度系数 = professionalism / MAX_ATTRIBUTE（100）；
 - 年龄系数按 GROWTH_AGE_BRACKETS 分段（16-22 高速 / 23-28 正常 / 29+ 下降）；
-- 结果先按 GROWTH_ROUND_STEP（0.5）粒度取整，再折算为整数属性点数；
-- 有效训练至少 +1（MVP 属性为整数，30 岁左右的 +0.5 折算为 +1）。
+- 结果四舍五入为整数点数，收益不足半档记为 0（年龄增长后自然下降）。
+全局成长速率见 config.GROWTH_RATE，平衡调整只需改 config。
+（GROWTH_ROUND_STEP 为小数累加预留，MVP 属性为整数暂不参与计算。）
 """
 
 from __future__ import annotations
@@ -31,9 +32,6 @@ def growth_amount(age: int, professionalism: int, base_gain: int) -> int:
         base_gain
         * age_factor(age)
         * (professionalism / settings.MAX_ATTRIBUTE)
+        * settings.GROWTH_RATE
     )
-    step = settings.GROWTH_ROUND_STEP
-    quantized = round(raw / step) * step
-    if quantized <= 0:
-        quantized = step
-    return int(quantized + 0.5)
+    return max(0, int(raw + 0.5))

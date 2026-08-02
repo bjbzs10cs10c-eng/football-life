@@ -1,5 +1,9 @@
-"""属性面板组件（UIDesign §6.3 / §12）：15 项属性进度条分组展示。"""
+"""属性面板组件（UIDesign §6.3 / §12 / §13）。
 
+15 项属性进度条分组展示；refresh 时对发生变化的属性播放 72→74 式平滑动效。
+"""
+
+from PyQt6.QtCore import QEasingCurve, QVariantAnimation
 from PyQt6.QtWidgets import (
     QGridLayout,
     QLabel,
@@ -19,6 +23,8 @@ class AttributePanel(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWidgetResizable(True)
+        self._last_values: dict = {}
+        self._animations: dict = {}
         container = QWidget()
         self._layout = QVBoxLayout(container)
         self._bars = {}
@@ -48,5 +54,39 @@ class AttributePanel(QScrollArea):
     def refresh(self, player: Player) -> None:
         """用球员属性刷新全部进度条。"""
         for key, (bar, value) in self._bars.items():
-            bar.setValue(player.attributes[key])
-            value.setText(str(player.attributes[key]))
+            new_value = player.attributes[key]
+            old_value = self._last_values.get(key, new_value)
+            if old_value != new_value:
+                self._animate(key, bar, value, old_value, new_value)
+            else:
+                bar.setValue(new_value)
+                value.setText(str(new_value))
+            self._last_values[key] = new_value
+
+    def _animate(
+        self,
+        key: str,
+        bar: QProgressBar,
+        value_label: QLabel,
+        start: int,
+        end: int,
+    ) -> None:
+        """旧值 -> 新值的平滑动效（约 600ms），结束后定格最终值。"""
+        animation = self._animations.get(key)
+        if animation is not None:
+            animation.stop()
+        animation = QVariantAnimation(self)
+        animation.setStartValue(start)
+        animation.setEndValue(end)
+        animation.setDuration(600)
+        animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+
+        def on_value(changed) -> None:
+            current = int(changed)
+            bar.setValue(current)
+            value_label.setText(str(current))
+
+        animation.valueChanged.connect(on_value)
+        animation.finished.connect(lambda: value_label.setText(str(end)))
+        animation.start()
+        self._animations[key] = animation

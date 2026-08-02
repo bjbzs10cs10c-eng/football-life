@@ -10,6 +10,7 @@ import models.club as mc
 import systems.player_creation as pc
 import systems.transfer as tr
 from models.career import Career
+from ui.components.attribute_panel import AttributePanel
 from ui.career_page import CareerPage
 from ui.club_page import ClubPage
 from ui.create_player_page import CreatePlayerPage
@@ -268,6 +269,79 @@ class TestClubPage:
         page = ClubPage()
         page.refresh(None)
         assert page.name_label.text() == "青训"
+
+
+class TestAttributeAnimation:
+    def test_changed_attribute_animates_to_final_value(self, qapp):
+        panel = AttributePanel()
+        player = make_player()
+        panel.refresh(player)  # 首次加载：无动画
+        assert panel._animations == {}
+        player.attributes["shooting"] = 74
+        panel.refresh(player)  # 60 -> 74 触发动效
+        assert "shooting" in panel._animations
+        bar, value_label = panel._bars["shooting"]
+        assert wait_until(lambda: value_label.text() == "74", qapp)
+        assert bar.value() == 74
+        # 未变化的属性直接显示，无动画
+        assert (
+            panel._bars["passing"][0].value()
+            == player.attributes["passing"]
+        )
+
+    def test_repeated_refresh_no_crash(self, qapp):
+        panel = AttributePanel()
+        player = make_player()
+        for _ in range(3):
+            player.attributes["shooting"] += 1
+            panel.refresh(player)
+        assert wait_until(
+            lambda: panel._bars["shooting"][1].text()
+            == str(player.attributes["shooting"]),
+            qapp,
+        )
+
+
+class TestErrorHandling:
+    def test_corrupt_save_shows_friendly_warning(self, qapp, monkeypatch):
+        import sqlite3
+
+        from PyQt6.QtWidgets import QMessageBox
+
+        from ui import main_window
+
+        warnings = []
+
+        def fake_load():
+            raise sqlite3.DatabaseError("file is not a database")
+
+        monkeypatch.setattr(main_window.save_load, "load_game", fake_load)
+        monkeypatch.setattr(
+            QMessageBox, "warning", lambda *a, **k: warnings.append(a[2])
+        )
+        monkeypatch.setattr(QMessageBox, "information", lambda *a, **k: None)
+        window = MainWindow()
+        window._load_save()
+        assert window.stack.currentWidget() is window.start_page
+        assert any("损坏" in message for message in warnings)
+
+    def test_missing_resource_file_friendly_exit(self, qapp, monkeypatch):
+        from PyQt6.QtWidgets import QMessageBox
+
+        import main as entry
+
+        errors = []
+
+        def broken_load(*args, **kwargs):
+            raise FileNotFoundError("clubs.json 不存在")
+
+        monkeypatch.setattr("models.club.load_clubs", broken_load)
+        monkeypatch.setattr(
+            QMessageBox, "critical", lambda *a, **k: errors.append(a[2])
+        )
+        code = entry.main()
+        assert code == 1
+        assert errors and "资源加载失败" in errors[0]
 
 
 class TestFullFlow:

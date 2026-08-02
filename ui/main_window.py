@@ -5,6 +5,8 @@
 训练与比赛页由 C12 实现，通过 data_changed/log_message/finished 与仪表盘联动。
 """
 
+import sqlite3
+
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QStackedWidget
 
 import config.settings as settings
@@ -85,6 +87,11 @@ class MainWindow(QMainWindow):
             data = save_load.load_game()
         except FileNotFoundError:
             QMessageBox.information(self, "读取存档", "未找到存档，请先开始新生涯。")
+            return
+        except (sqlite3.DatabaseError, ValueError):
+            QMessageBox.warning(
+                self, "读取存档", "存档损坏或无法读取，请开始新生涯。"
+            )
             return
         self.dashboard.set_data(data.player, data.club, data.matches, data.career)
         self.dashboard.log(f"欢迎回来，{data.player.name}！")
