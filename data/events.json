@@ -4,69 +4,79 @@
     "description": "教练发现你的射门天赋，把你叫到一边单独指导。",
     "choice_a": "加练射门",
     "choice_b": "保持训练计划",
-    "effect": "shooting+3;condition-20"
+    "effect_a": "shooting+3;condition-20",
+    "effect_b": "none"
   },
   {
     "type": "training",
     "description": "队友约你加练体能，问你要不要一起去。",
     "choice_a": "接受挑战",
     "choice_b": "婉言拒绝",
-    "effect": "pace+2;stamina+2;condition-20"
+    "effect_a": "pace+2;stamina+2;condition-20",
+    "effect_b": "condition+10"
   },
   {
     "type": "training",
     "description": "训练中你和老队员发生了口角，更衣室气氛有些紧张。",
     "choice_a": "主动道歉，冷静沟通",
     "choice_b": "针锋相对，寸步不让",
-    "effect": "professionalism+2"
+    "effect_a": "professionalism+2",
+    "effect_b": "pressure+2;reputation-5"
   },
   {
     "type": "training",
     "description": "青训教练单独为你开了一堂战术课，讲如何阅读比赛。",
     "choice_a": "认真听讲，做笔记",
     "choice_b": "太累了，请假休息",
-    "effect": "decision+2"
+    "effect_a": "decision+2",
+    "effect_b": "condition+15"
   },
   {
     "type": "match",
     "description": "教练让你替补登场，球队落后，只剩最后三十分钟。",
     "choice_a": "全力冲击，抓住机会",
     "choice_b": "稳字当头，减少失误",
-    "effect": "reputation+10;pressure+3"
+    "effect_a": "reputation+10;pressure+3",
+    "effect_b": "reputation+3"
   },
   {
     "type": "match",
     "description": "赛前更衣室里气氛紧张，队友们都沉默不语。",
     "choice_a": "站出来发表简短讲话",
     "choice_b": "保持安静，专注自己",
-    "effect": "leadership+2"
+    "effect_a": "leadership+2",
+    "effect_b": "none"
   },
   {
     "type": "match",
     "description": "媒体预测你将在本轮首发，铺天盖地的报道涌来。",
     "choice_a": "用场上的表现回应",
     "choice_b": "屏蔽外界，专心备战",
-    "effect": "pressure+3;reputation+5"
+    "effect_a": "pressure+3;reputation+5",
+    "effect_b": "pressure+2"
   },
   {
     "type": "career",
     "description": "有欧洲豪门的球探来看你比赛，经纪人问你有什么想法。",
     "choice_a": "留在球队成为核心",
     "choice_b": "表态愿意挑战更高舞台",
-    "effect": "professionalism+3;reputation+5"
+    "effect_a": "professionalism+3;reputation+5",
+    "effect_b": "reputation+8"
   },
   {
     "type": "career",
     "description": "你扭伤了脚踝，队医建议休息两周。",
     "choice_a": "积极康复，遵医嘱",
     "choice_b": "忍痛坚持训练",
-    "effect": "professionalism+2;condition+20"
+    "effect_a": "professionalism+2;condition+20",
+    "effect_b": "strength-2;condition-20"
   },
   {
     "type": "career",
     "description": "你收到一份商业代言邀约，出场费相当可观。",
     "choice_a": "接下代言，多赚一笔",
     "choice_b": "拒绝代言，专注足球",
-    "effect": "money+5000;reputation+3"
+    "effect_a": "money+5000;reputation+3",
+    "effect_b": "professionalism+3"
   }
 ]

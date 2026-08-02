@@ -1,8 +1,9 @@
-"""随机事件模型（A3）。
+"""随机事件模型（A3 / B8）。
 
-字段与 database/init.sql 的 events 表一一对应：
-type / description / choice_a / choice_b / effect。
-effect 采用简洁表达式，例如 "shooting+3;condition-20" 或 "none"。
+字段与 database/init.sql 的 events 表对应（effect 拆分为选项效果）：
+type / description / choice_a / choice_b / effect_a / effect_b。
+effect_a / effect_b 分别对应选择 A / B 的效果，采用简洁表达式，
+例如 "shooting+3;condition-20" 或 "none"。
 """
 
 from __future__ import annotations
@@ -51,7 +52,8 @@ class GameEvent:
     description: str
     choice_a: str
     choice_b: str
-    effect: str
+    effect_a: str
+    effect_b: str
     id: int | None = None
 
     def validate(self) -> "GameEvent":
@@ -65,20 +67,18 @@ class GameEvent:
             value = getattr(self, field_name)
             if not value or not value.strip():
                 errors.append(f"{field_name} 不能为空")
-        if not self.effect or not self.effect.strip():
-            errors.append("effect 不能为空")
-        else:
-            try:
-                parse_effect(self.effect)
-            except ValueError as exc:
-                errors.append(str(exc))
+        for field_name in ("effect_a", "effect_b"):
+            value = getattr(self, field_name)
+            if not value or not value.strip():
+                errors.append(f"{field_name} 不能为空")
+            else:
+                try:
+                    parse_effect(value)
+                except ValueError as exc:
+                    errors.append(str(exc))
         if errors:
             raise ValueError("事件数据校验失败:\n" + "\n".join(errors))
         return self
-
-    def effect_parsed(self) -> dict:
-        """解析后的效果字典（键 -> 增量）。"""
-        return parse_effect(self.effect)
 
     def to_dict(self) -> dict:
         return asdict(self)

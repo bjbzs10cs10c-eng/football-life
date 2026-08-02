@@ -62,7 +62,10 @@ class TestEventsJson:
 
     def test_fields_match_events_table(self):
         events = json.loads(EVENTS_FILE.read_text(encoding="utf-8"))
-        table_columns = {"type", "description", "choice_a", "choice_b", "effect"}
+        table_columns = {
+            "type", "description", "choice_a", "choice_b",
+            "effect_a", "effect_b",
+        }
         for event in events:
             assert set(event.keys()) == table_columns, event
 
@@ -75,12 +78,13 @@ class TestEventsJson:
     def test_effect_grammar_valid(self):
         events = json.loads(EVENTS_FILE.read_text(encoding="utf-8"))
         for event in events:
-            parsed = me.parse_effect(event["effect"])
-            for key, delta in parsed.items():
-                assert isinstance(delta, int)
-                assert key in set(s.ALL_ATTRIBUTES) | set(
-                    s.EVENT_SPECIAL_EFFECT_KEYS
-                )
+            for field_name in ("effect_a", "effect_b"):
+                parsed = me.parse_effect(event[field_name])
+                for key, delta in parsed.items():
+                    assert isinstance(delta, int)
+                    assert key in set(s.ALL_ATTRIBUTES) | set(
+                        s.EVENT_SPECIAL_EFFECT_KEYS
+                    )
 
     def test_no_duplicate_descriptions(self):
         events = json.loads(EVENTS_FILE.read_text(encoding="utf-8"))

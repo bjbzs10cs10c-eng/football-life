@@ -39,7 +39,8 @@ def make_valid_event():
         description="测试事件",
         choice_a="选项A",
         choice_b="选项B",
-        effect="shooting+1",
+        effect_a="shooting+1",
+        effect_b="none",
     )
 
 
@@ -162,6 +163,12 @@ class TestEventModel:
         with pytest.raises(ValueError, match="choice_a"):
             event.validate()
 
+    def test_rejects_empty_effect(self):
+        event = make_valid_event()
+        event.effect_b = ""
+        with pytest.raises(ValueError, match="effect_b"):
+            event.validate()
+
     def test_parse_effect_none(self):
         assert me.parse_effect(me.EFFECT_NONE) == {}
 
@@ -230,7 +237,8 @@ class TestJsonLoaders:
             json.dumps(
                 [
                     {"type": event_type, "description": f"{event_type}事件",
-                     "choice_a": "A", "choice_b": "B", "effect": "none"}
+                     "choice_a": "A", "choice_b": "B",
+                     "effect_a": "none", "effect_b": "none"}
                     for event_type in s.EVENT_TYPES
                 ],
                 ensure_ascii=False,
@@ -245,7 +253,7 @@ class TestJsonLoaders:
         path.write_text(
             json.dumps(
                 [{"type": "training", "description": "x", "choice_a": "A",
-                  "choice_b": "B", "effect": "none"}],
+                  "choice_b": "B", "effect_a": "none", "effect_b": "none"}],
                 ensure_ascii=False,
             ),
             encoding="utf-8",
