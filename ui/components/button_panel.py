@@ -9,6 +9,7 @@ class ButtonPanel(QWidget):
     match_requested = pyqtSignal()
     transfer_requested = pyqtSignal()
     career_requested = pyqtSignal()
+    club_requested = pyqtSignal()
     save_requested = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -20,6 +21,7 @@ class ButtonPanel(QWidget):
             ("下一场比赛", self.match_requested),
             ("转会市场", self.transfer_requested),
             ("生涯统计", self.career_requested),
+            ("查看球队", self.club_requested),
             ("保存进度", self.save_requested),
         ]
         self._buttons = {}

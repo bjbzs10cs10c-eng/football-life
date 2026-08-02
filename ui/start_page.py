@@ -33,10 +33,6 @@ class StartPage(QWidget):
         self.load_button.setFixedSize(220, 50)
         self.load_button.clicked.connect(self.load_save_clicked.emit)
 
-        self.settings_button = QPushButton("设置")
-        self.settings_button.setFixedSize(220, 50)
-        self.settings_button.setEnabled(False)  # MVP 无设置页
-
         button_row = QHBoxLayout()
         button_row.addStretch(1)
         button_row.addLayout(self._buttons_column())
@@ -46,6 +42,6 @@ class StartPage(QWidget):
 
     def _buttons_column(self):
         column = QVBoxLayout()
-        for button in (self.new_button, self.load_button, self.settings_button):
+        for button in (self.new_button, self.load_button):
             column.addWidget(button, alignment=Qt.AlignmentFlag.AlignCenter)
         return column
