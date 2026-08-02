@@ -151,6 +151,10 @@ MATCH_RANDOM_FACTOR = 10        # 进球概率随机幅度（百分点的 ±10�
 OPPORTUNITY_RANDOM_FACTOR = 5   # 机会数量的随机因素（PRD 示例 +5）
 OPPORTUNITY_CLUB_WEIGHT = 1.0
 OPPORTUNITY_PLAYER_WEIGHT = 1.0
+# 机会值折算为实际机会次数（机会值 ≈ 双方实力+射门，MVP 折算为 1~6 次）
+OPPORTUNITY_DIVISOR = 30
+# 比赛体力消耗（PRD 核心循环：一天一个行动点）
+MATCH_CONDITION_COST = 25
 
 # 进球概率 = clamp((射门 - 对手门将能力) × SLOPE + 随机, MIN, MAX)
 # 默认 SLOPE=0.05：射门 85 vs 门将 75 时基准为 50%（对应 TDD 示例）
@@ -170,6 +174,13 @@ RATING_KEY_PERF_BONUS = 0.5
 RATING_MISTAKE_PENALTY = 0.5
 RATING_MIN = 1.0
 RATING_MAX = 10.0
+
+# 助攻判定：进球后按概率记 1 次助攻
+ASSIST_CHANCE_PERCENT = 30
+
+# 对手进球：clamp(round((对手实力-我方实力)/除数 + 随机), 0, ...)
+OPPONENT_GOAL_FACTOR = 15
+OPPONENT_GOAL_RANDOM = 1
 
 MATCH_INTERVAL_DAYS = 7         # 每 7 天一场联赛比赛
 
@@ -279,6 +290,15 @@ def validate_config(settings=None):
 
     if s["INJURY_CONDITION_PENALTY"] < 0:
         errors.append("INJURY_CONDITION_PENALTY 不能为负")
+
+    if s["OPPORTUNITY_DIVISOR"] <= 0:
+        errors.append("OPPORTUNITY_DIVISOR 必须为正数")
+    if not (0 <= s["MATCH_CONDITION_COST"] <= 100):
+        errors.append("MATCH_CONDITION_COST 须在 0-100")
+    if not (0 <= s["ASSIST_CHANCE_PERCENT"] <= 100):
+        errors.append("ASSIST_CHANCE_PERCENT 须在 0-100")
+    if s["OPPONENT_GOAL_FACTOR"] <= 0:
+        errors.append("OPPONENT_GOAL_FACTOR 必须为正数")
 
     weight_sum = (
         s["OVERALL_WEIGHT_TECHNICAL"]
