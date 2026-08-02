@@ -1,6 +1,14 @@
-"""UI 基础组件（UIDesign §12）：PlayerCard / AttributePanel / ButtonPanel。"""
+"""UI 基础组件（UIDesign §12）。"""
 
 from ui.components.attribute_panel import AttributePanel
+from ui.components.EventDialog import EventDialog, effect_to_text
+from ui.components.MatchTextBox import MatchTextBox
 from ui.components.player_card import PlayerCard
 
-__all__ = ["PlayerCard", "AttributePanel"]
+__all__ = [
+    "PlayerCard",
+    "AttributePanel",
+    "EventDialog",
+    "effect_to_text",
+    "MatchTextBox",
+]
