@@ -95,7 +95,28 @@ class Player:
     def from_dict(cls, data: dict) -> "Player":
         return cls(**data)
 
+    def overall(self) -> int:
+        """综合能力（PRD §6）：技术×40% + 身体×30% + 心理×30%。"""
+        return calculate_overall(self.attributes)
+
     @classmethod
     def make_default_attributes(cls) -> dict:
         """生成一份 15 项属性齐全的默认字典（值取区间下界，B4 再随机化）。"""
         return {key: settings.MIN_ATTRIBUTE for key in settings.ALL_ATTRIBUTES}
+
+
+def calculate_overall(attributes: dict) -> int:
+    """综合能力计算：各分类均值按配置权重加权后四舍五入取整。"""
+
+    def _mean(keys: list) -> float:
+        return sum(attributes[key] for key in keys) / len(keys)
+
+    technical = _mean(settings.ATTRIBUTE_TECHNICAL)
+    physical = _mean(settings.ATTRIBUTE_PHYSICAL)
+    mental = _mean(settings.ATTRIBUTE_MENTAL)
+    raw = (
+        technical * settings.OVERALL_WEIGHT_TECHNICAL
+        + physical * settings.OVERALL_WEIGHT_PHYSICAL
+        + mental * settings.OVERALL_WEIGHT_MENTAL
+    )
+    return int(round(raw))
