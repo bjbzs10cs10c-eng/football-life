@@ -58,12 +58,20 @@ class Club:
 
 
 def load_clubs(path: str | Path | None = None) -> list[Club]:
-    """读取 data/clubs.json，逐条校验并检查重复与等级覆盖。"""
+    """读取 data/clubs.json，逐条校验并检查重复与等级覆盖。
+
+    内存中的 Club.id 按数据文件顺序分配（1..N），供 player.club_id 引用；
+    存档写入数据库后以数据库生成的 id 为准。
+    """
     p = Path(path) if path is not None else Path(settings.CLUBS_DATA_FILE)
     if not p.is_absolute():
         p = Path(__file__).resolve().parent.parent / p
     raw = json.loads(p.read_text(encoding="utf-8"))
-    clubs = [Club.from_dict(item).validate() for item in raw]
+    clubs = []
+    for index, item in enumerate(raw, start=1):
+        club = Club.from_dict(item).validate()
+        club.id = index
+        clubs.append(club)
 
     names = [c.name for c in clubs]
     dupes = sorted({n for n in names if names.count(n) > 1})
