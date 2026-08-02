@@ -85,6 +85,18 @@ START_CONDITION = 100           # 体力（行动资源，独立于“耐力”�
 MAX_CONDITION = 100
 MIN_CONDITION = 0
 RETIRE_AGE = 35                 # 赛季末年龄达到则触发退役评价
+RETIRE_EVAL_RULES = [
+    {"min_trophies": 5, "min_games": 0, "label": "传奇",
+     "description": "你以传奇身份告别足坛，{trophies} 座冠军奖杯铭记史册。"},
+    {"min_trophies": 1, "min_games": 0, "label": "球星",
+     "description": "你捧起过冠军奖杯，是球迷心中的球星。"},
+    {"min_trophies": 0, "min_games": 300, "label": "优秀",
+     "description": "你拥有漫长而稳定的职业生涯，值得尊敬。"},
+    {"min_trophies": 0, "min_games": 100, "label": "普通",
+     "description": "你的职业生涯平淡而充实。"},
+    {"min_trophies": 0, "min_games": 0, "label": "平庸",
+     "description": "足球生涯早早结束，愿你找到新的方向。"},
+]
 
 # 初始属性随机范围（B4 使用）
 INITIAL_ATTRIBUTE_MIN = 50
@@ -299,6 +311,18 @@ def validate_config(settings=None):
         errors.append("ASSIST_CHANCE_PERCENT 须在 0-100")
     if s["OPPONENT_GOAL_FACTOR"] <= 0:
         errors.append("OPPONENT_GOAL_FACTOR 必须为正数")
+
+    retire_rules = s["RETIRE_EVAL_RULES"]
+    if not retire_rules:
+        errors.append("RETIRE_EVAL_RULES 不能为空")
+    else:
+        for rule in retire_rules:
+            for key in ("min_trophies", "min_games", "label", "description"):
+                if key not in rule:
+                    errors.append(f"RETIRE_EVAL_RULES 条目缺少字段: {key}")
+        last = retire_rules[-1]
+        if last.get("min_games") != 0 or last.get("min_trophies") != 0:
+            errors.append("RETIRE_EVAL_RULES 最后一条须为兜底规则（门槛均为 0）")
 
     weight_sum = (
         s["OVERALL_WEIGHT_TECHNICAL"]
