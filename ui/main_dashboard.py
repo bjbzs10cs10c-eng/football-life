@@ -96,7 +96,7 @@ class MainDashboard(QWidget):
         self.player = player
         self.club = club
         self.matches = matches or []
-        self.career = career
+        self.career = career if career is not None else Career()
         self.refresh()
 
     def refresh(self) -> None:

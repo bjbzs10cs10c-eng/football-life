@@ -21,6 +21,7 @@ import config.settings as settings
 import systems.career as career
 import systems.match_engine as match_engine
 from models.club import Club
+from models.career import Career
 from models.match import MatchRecord
 from models.player import Player
 from ui.components.MatchTextBox import MatchTextBox
@@ -37,6 +38,7 @@ class MatchPage(QWidget):
         self.player: Player | None = None
         self.club: Club | None = None
         self.matches: list[MatchRecord] = []
+        self.career: Career | None = None
         self._busy = False
 
         layout = QVBoxLayout(self)
@@ -82,10 +84,12 @@ class MatchPage(QWidget):
         player: Player,
         club: Club | None,
         matches: list[MatchRecord],
+        career: Career | None = None,
     ) -> None:
         self.player = player
         self.club = club
         self.matches = matches
+        self.career = career
         self._pick_opponent()
         self._refresh_match_day()
         self.refresh()
@@ -132,6 +136,10 @@ class MatchPage(QWidget):
                 self.opponent.strength,
             )
             self.matches.append(result.to_record())
+            if self.career is not None:
+                self.career.games += 1
+                self.career.goals += result.goals
+                self.career.assists += result.assists
             self.score_label.setText(
                 f"比分: {self.player.name} 所在队 {result.result} {self.opponent.name}"
             )
@@ -140,9 +148,8 @@ class MatchPage(QWidget):
                 f"{result.outcome.upper()} | 奖金+{result.bonus}"
                 f" | 声望+{result.reputation_gain} | 体力-{result.condition_cost}"
             )
-            day_logs = career.advance_days(
-                self.player, settings.MATCH_INTERVAL_DAYS, club=self.club
-            )
+            # 比赛占用当天，结束后进入下一天（下一场比赛在 6 天后）
+            day_logs = career.advance_days(self.player, 1, club=self.club)
             for log in day_logs:
                 self.log_message.emit(log)
             event_result = run_event_if_any(self.player, "match", self)

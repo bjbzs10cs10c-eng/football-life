@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
             self.dashboard.player,
             self.dashboard.club,
             self.dashboard.matches,
+            career=self.dashboard.career,
         )
         self.stack.setCurrentWidget(self.match_page)
 

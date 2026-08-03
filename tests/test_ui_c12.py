@@ -13,6 +13,7 @@ import models.event as me
 import systems.career as career_sys
 import systems.player_creation as pc
 import systems.save_load as sl
+from models.career import Career
 from ui.components.EventDialog import EventDialog, effect_to_text
 from ui.components.MatchTextBox import MatchTextBox
 from ui.main_window import MainWindow
@@ -245,8 +246,23 @@ class TestMatchPage:
         page._on_play()  # 播放期间连点：应被忽略
         assert len(matches) == 1
         assert wait_until(lambda: bool(finished), qapp)
-        page._on_play()  # 播放结束后可再赛
+        # 比赛结束进入下一天，推进 6 天到下一比赛日再赛
+        career_sys.advance_days(player, 6)
+        page._refresh_match_day()
+        page._on_play()
         assert len(matches) == 2
+
+    def test_match_updates_career_stats(self, qapp, monkeypatch):
+        no_event(monkeypatch)
+        player = make_player()
+        career = Career()
+        page = MatchPage()
+        page.set_data(player, make_club(), [], career=career)
+        page._on_play()
+        assert career.games == 1
+        assert career.goals == page.matches[0].goals
+        assert career.assists == page.matches[0].assists
+        assert page.player.current_date != "2026-01-01"  # 赛后进入下一天
 
 
 class TestThreeWaySync:

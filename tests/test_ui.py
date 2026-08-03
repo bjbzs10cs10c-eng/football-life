@@ -420,9 +420,11 @@ class TestFullFlow:
         )
         window.match_page.back_button.click()
         assert window.stack.currentWidget() is window.dashboard
+        # 比赛结束进入下一天，且生涯统计已累计
+        assert career_sys.days_until_next_match(player) != 0
+        assert window.dashboard.career.games == 1
 
-        # 比赛后推进一天离开比赛日，再训练（技术训练，体力下降）
-        career_sys.advance_days(player, 1)
+        # 训练（技术训练，体力下降）
         window._open_training()
         assert window.stack.currentWidget() is window.training_page
         window.training_page.type_buttons["TECHNICAL"].click()
