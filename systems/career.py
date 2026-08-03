@@ -73,6 +73,16 @@ def should_retire(player: Player) -> bool:
     return player.age >= settings.RETIRE_AGE
 
 
+def days_until_next_match(player: Player) -> int:
+    """距下一场比赛的天数：0 表示今天就是比赛日（每 MATCH_INTERVAL_DAYS 天一轮）。"""
+    start = date.fromisoformat(settings.SEASON_START_DATE)
+    current = date.fromisoformat(player.current_date)
+    day_index = (current - start).days
+    return (
+        settings.MATCH_INTERVAL_DAYS - day_index % settings.MATCH_INTERVAL_DAYS
+    ) % settings.MATCH_INTERVAL_DAYS
+
+
 def retirement_evaluation(
     player: Player,
     career: Career | None = None,

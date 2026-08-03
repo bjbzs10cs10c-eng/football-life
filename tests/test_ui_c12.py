@@ -51,6 +51,17 @@ def no_event(monkeypatch):
     monkeypatch.setattr("ui.match_page.run_event_if_any", lambda *a, **k: None)
 
 
+class FakeRng:
+    """按顺序返回预设 randint 结果，保证训练成长确定性。"""
+
+    def __init__(self, values):
+        self.values = list(values)
+
+    def randint(self, low, high):
+        assert self.values, "FakeRng 的随机值已耗尽"
+        return self.values.pop(0)
+
+
 class TestMatchTextBox:
     def test_append_all(self, qapp):
         box = MatchTextBox()
@@ -104,6 +115,10 @@ class TestTrainingPage:
     def test_training_refreshes_player_and_page(self, qapp, monkeypatch):
         no_message_box(monkeypatch)
         no_event(monkeypatch)
+        # 固定随机：体能训练不受伤，且三项基础收益均为 3（保证成长）
+        monkeypatch.setattr(
+            "systems.training._random", FakeRng([95, 3, 3, 3])
+        )
         player = make_player()
         club = make_club()
         page = TrainingPage()
@@ -209,6 +224,7 @@ class TestThreeWaySync:
         no_message_box(monkeypatch)
         no_event(monkeypatch)
         from systems.event_manager import handle_event
+        import systems.career as career_sys
 
         player = make_player()
         club = make_club()
@@ -218,6 +234,8 @@ class TestThreeWaySync:
         page = TrainingPage()
         page.set_data(player, club)
         page._on_start()
+        # 训练后推进 6 天到下一个比赛日（一周一赛），再比赛
+        career_sys.advance_days(player, 6, club=club)
         # 界面层：比赛一次
         match_page = MatchPage()
         match_page.set_data(player, club, matches)

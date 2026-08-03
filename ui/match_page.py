@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 )
 
 import models.club as club_model
+import config.settings as settings
 import systems.career as career
 import systems.match_engine as match_engine
 from models.club import Club
@@ -43,6 +44,8 @@ class MatchPage(QWidget):
         title.setProperty("role", "section")
         self.fixture_label = QLabel("")
         self.fixture_label.setProperty("role", "title")
+        self.day_label = QLabel("")
+        self.day_label.setProperty("role", "data")
         self.score_label = QLabel("比分: --")
         self.score_label.setProperty("role", "data")
         self.rating_label = QLabel("评分: --")
@@ -51,6 +54,7 @@ class MatchPage(QWidget):
         self.settle_label.setProperty("role", "dim")
         layout.addWidget(title)
         layout.addWidget(self.fixture_label)
+        layout.addWidget(self.day_label)
         layout.addWidget(self.score_label)
         layout.addWidget(self.rating_label)
         layout.addWidget(self.settle_label)
@@ -83,7 +87,20 @@ class MatchPage(QWidget):
         self.club = club
         self.matches = matches
         self._pick_opponent()
+        self._refresh_match_day()
         self.refresh()
+
+    def _refresh_match_day(self) -> None:
+        """比赛日才允许比赛：非比赛日禁用按钮并显示倒计时。"""
+        if self.player is None:
+            return
+        days = career.days_until_next_match(self.player)
+        if days == 0:
+            self.play_button.setEnabled(True)
+            self.day_label.setText("今天是一周一度的比赛日！")
+        else:
+            self.play_button.setEnabled(False)
+            self.day_label.setText(f"距离下一场比赛还有 {days} 天")
 
     def _pick_opponent(self) -> None:
         rng = _random
@@ -103,6 +120,8 @@ class MatchPage(QWidget):
     def _on_play(self) -> None:
         if self._busy or self.player is None or self.opponent is None:
             return
+        if career.days_until_next_match(self.player) != 0:
+            return  # 非比赛日不允许比赛（一周一赛）
         self._busy = True
         self.play_button.setEnabled(False)
         try:
@@ -121,7 +140,9 @@ class MatchPage(QWidget):
                 f"{result.outcome.upper()} | 奖金+{result.bonus}"
                 f" | 声望+{result.reputation_gain} | 体力-{result.condition_cost}"
             )
-            day_logs = career.advance_days(self.player, 1, club=self.club)
+            day_logs = career.advance_days(
+                self.player, settings.MATCH_INTERVAL_DAYS, club=self.club
+            )
             for log in day_logs:
                 self.log_message.emit(log)
             event_result = run_event_if_any(self.player, "match", self)
@@ -136,6 +157,6 @@ class MatchPage(QWidget):
 
     def _on_playback_finished(self) -> None:
         self._busy = False
-        self.play_button.setEnabled(True)
+        self._refresh_match_day()
         self._pick_opponent()
         self.refresh()

@@ -129,3 +129,23 @@ class TestRetirement:
     def test_evaluation_mediocre_fallback(self):
         result = career.retirement_evaluation(make_player(), mcareer.Career())
         assert result.label == "平庸"
+
+
+class TestMatchSchedule:
+    def test_season_start_is_match_day(self):
+        assert career.days_until_next_match(make_player()) == 0
+
+    def test_mid_week_countdown(self):
+        # 2026-01-04 是第 4 天（day3），距 day7 比赛日还有 4 天
+        player = make_player("2026-01-04")
+        assert career.days_until_next_match(player) == 4
+
+    def test_day_before_match(self):
+        # 2026-01-07 是 day6，距比赛日 1 天
+        player = make_player("2026-01-07")
+        assert career.days_until_next_match(player) == 1
+
+    def test_next_match_day_is_zero(self):
+        # 2026-01-08 是 day7，恰好比赛日
+        player = make_player("2026-01-08")
+        assert career.days_until_next_match(player) == 0

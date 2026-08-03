@@ -7,6 +7,7 @@ import pytest
 
 import config.settings as s
 import models.club as mc
+import systems.career as career_sys
 import systems.player_creation as pc
 import systems.transfer as tr
 from models.career import Career
@@ -16,6 +17,7 @@ from ui.club_page import ClubPage
 from ui.create_player_page import CreatePlayerPage
 from ui.main_dashboard import MainDashboard
 from ui.main_window import MainWindow
+from ui.match_page import MatchPage
 from ui.start_page import StartPage
 from ui.transfer_page import TransferPage
 
@@ -302,6 +304,48 @@ class TestAttributeAnimation:
         )
 
 
+class TestMatchSchedule:
+    def test_theme_has_selection_styles(self, qapp):
+        from ui.theme import build_stylesheet
+
+        css = build_stylesheet()
+        assert "QRadioButton::indicator:checked" in css
+        assert "QPushButton:checked" in css
+
+    def test_dashboard_shows_match_countdown(self, qapp):
+        dashboard = MainDashboard()
+        player = make_player()  # 2026-01-01 比赛日
+        dashboard.set_data(player)
+        assert dashboard.next_match_label.text() == "比赛日"
+        career_sys.advance_days(player, 3)
+        dashboard.refresh()
+        assert "4 天" in dashboard.next_match_label.text()
+
+    def test_match_day_enables_play(self, qapp):
+        page = MatchPage()
+        page.set_data(make_player(), None, [])
+        assert page.play_button.isEnabled()
+        assert "比赛日" in page.day_label.text()
+
+    def test_non_match_day_disables_play(self, qapp):
+        player = make_player()
+        career_sys.advance_days(player, 3)  # 距下场比赛 4 天
+        page = MatchPage()
+        page.set_data(player, None, [])
+        assert not page.play_button.isEnabled()
+        assert "4 天" in page.day_label.text()
+
+    def test_play_blocked_outside_match_day(self, qapp, monkeypatch):
+        no_event(monkeypatch)
+        player = make_player()
+        career_sys.advance_days(player, 3)
+        page = MatchPage()
+        matches = []
+        page.set_data(player, None, matches)
+        page._on_play()
+        assert matches == []
+
+
 class TestErrorHandling:
     def test_corrupt_save_shows_friendly_warning(self, qapp, monkeypatch):
         import sqlite3
@@ -366,16 +410,7 @@ class TestFullFlow:
         player = window.dashboard.player
         assert player.name == "Flow Player"
 
-        # 训练（技术训练，体力下降）
-        window._open_training()
-        assert window.stack.currentWidget() is window.training_page
-        window.training_page.type_buttons["TECHNICAL"].click()
-        window.training_page.start_button.click()
-        assert player.condition < s.START_CONDITION
-        window.training_page.back_button.click()
-        assert window.stack.currentWidget() is window.dashboard
-
-        # 比赛（记录进入 matches）
+        # 比赛（开局第一天即比赛日，记录进入 matches）
         before = len(window.dashboard.matches)
         window._open_match()
         assert window.stack.currentWidget() is window.match_page
@@ -384,6 +419,15 @@ class TestFullFlow:
             lambda: len(window.dashboard.matches) == before + 1, qapp
         )
         window.match_page.back_button.click()
+        assert window.stack.currentWidget() is window.dashboard
+
+        # 训练（技术训练，体力下降，推进一天）
+        window._open_training()
+        assert window.stack.currentWidget() is window.training_page
+        window.training_page.type_buttons["TECHNICAL"].click()
+        window.training_page.start_button.click()
+        assert player.condition < s.START_CONDITION
+        window.training_page.back_button.click()
         assert window.stack.currentWidget() is window.dashboard
 
         # 转会（提升能力后进入转会页并接受）

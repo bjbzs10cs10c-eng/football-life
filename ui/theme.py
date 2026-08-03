@@ -104,6 +104,25 @@ def build_stylesheet() -> str:
         color: {c['text']};
         spacing: 6px;
     }}
+    QRadioButton::indicator {{
+        width: 16px;
+        height: 16px;
+        border: 2px solid {c['text_dim']};
+        border-radius: 9px;
+        background-color: {c['card']};
+    }}
+    QRadioButton::indicator:checked {{
+        border: 2px solid {c['gold']};
+        background-color: {c['gold']};
+    }}
+    QPushButton:checked {{
+        background-color: {c['gold']};
+        color: #1F2937;
+        font-weight: bold;
+    }}
+    QPushButton:checked:hover {{
+        background-color: #E6C84A;
+    }}
     """
 
 

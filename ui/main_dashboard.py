@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 import config.settings as settings
+import systems.career as career_sys
 from models.career import Career
 from models.club import Club
 from models.match import MatchRecord
@@ -66,12 +67,14 @@ class MainDashboard(QWidget):
         self.club_label = QLabel("")
         self.reputation_label = QLabel("")
         self.money_label = QLabel("")
+        self.next_match_label = QLabel("")
         for label in (
             self.date_label,
             self.season_label,
             self.club_label,
             self.reputation_label,
             self.money_label,
+            self.next_match_label,
         ):
             label.setProperty("role", "data")
             bar.addWidget(label)
@@ -105,6 +108,10 @@ class MainDashboard(QWidget):
         self.club_label.setText(f"球队: {self.club.name if self.club else '青训'}")
         self.reputation_label.setText(f"声望: {self.player.reputation}")
         self.money_label.setText(f"金钱: {self.player.money}")
+        days = career_sys.days_until_next_match(self.player)
+        self.next_match_label.setText(
+            "比赛日" if days == 0 else f"距下场比赛: {days} 天"
+        )
         self.player_card.refresh(self.player)
         self.attribute_panel.refresh(self.player)
 
