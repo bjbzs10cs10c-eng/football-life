@@ -90,9 +90,16 @@ class TrainingPage(QWidget):
     def refresh(self) -> None:
         if self.player is None:
             return
+        is_match_day = career.days_until_next_match(self.player) == 0
+        self.start_button.setEnabled(not is_match_day)
         self.status_label.setText(
             f"{self.player.name}  |  日期 {self.player.current_date}"
             f"  |  体力 {self.player.condition}  |  金钱 {self.player.money}"
+            + (
+                "  |  今天是比赛日，请先完成比赛！"
+                if is_match_day
+                else ""
+            )
         )
 
     def _select(self, training_type: str) -> None:
@@ -102,6 +109,9 @@ class TrainingPage(QWidget):
 
     def _on_start(self) -> None:
         if self._busy or self.player is None:
+            return
+        if career.days_until_next_match(self.player) == 0:
+            QMessageBox.information(self, "训练", "今天是比赛日，请先完成比赛。")
             return
         self._busy = True
         self.start_button.setEnabled(False)

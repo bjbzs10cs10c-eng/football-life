@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QDialog, QMessageBox
 import config.settings as s
 import models.club as mc
 import models.event as me
+import systems.career as career_sys
 import systems.player_creation as pc
 import systems.save_load as sl
 from ui.components.EventDialog import EventDialog, effect_to_text
@@ -120,6 +121,7 @@ class TestTrainingPage:
             "systems.training._random", FakeRng([95, 3, 3, 3])
         )
         player = make_player()
+        career_sys.advance_days(player, 3)  # 非比赛日才能训练
         club = make_club()
         page = TrainingPage()
         page.set_data(player, club)
@@ -144,6 +146,7 @@ class TestTrainingPage:
         no_message_box(monkeypatch)
         no_event(monkeypatch)
         player = make_player()
+        career_sys.advance_days(player, 3)
         player.condition = 30
         page = TrainingPage()
         page.set_data(player, make_club())
@@ -158,6 +161,7 @@ class TestTrainingPage:
         )
         no_event(monkeypatch)
         player = make_player()
+        career_sys.advance_days(player, 3)
         player.condition = 5
         date = player.current_date
         page = TrainingPage()
@@ -170,12 +174,39 @@ class TestTrainingPage:
         no_message_box(monkeypatch)
         no_event(monkeypatch)
         player = make_player()
+        career_sys.advance_days(player, 1)  # day1 起步，连续 5 训不会跨进比赛日
         page = TrainingPage()
         page.set_data(player, make_club())
         for _ in range(5):
             page._on_start()
-        player.validate()  # 无崩溃
+        player.validate()
         assert player.condition == s.START_CONDITION - 5 * s.TRAINING_TYPES["TECHNICAL"]["condition_cost"]
+
+    def test_match_day_training_blocked(self, qapp, monkeypatch):
+        no_event(monkeypatch)
+        messages = []
+        monkeypatch.setattr(
+            QMessageBox, "information", lambda *a, **k: messages.append(a[2])
+        )
+        player = make_player()  # day0 比赛日
+        page = TrainingPage()
+        page.set_data(player, make_club())
+        assert not page.start_button.isEnabled()
+        date_before = player.current_date
+        condition_before = player.condition
+        page._on_start()
+        assert player.current_date == date_before
+        assert player.condition == condition_before
+        assert any("比赛日" in m for m in messages)
+
+    def test_off_match_day_training_allowed(self, qapp, monkeypatch):
+        no_message_box(monkeypatch)
+        no_event(monkeypatch)
+        player = make_player()
+        career_sys.advance_days(player, 3)
+        page = TrainingPage()
+        page.set_data(player, make_club())
+        assert page.start_button.isEnabled()
 
 
 class TestMatchPage:
@@ -233,9 +264,10 @@ class TestThreeWaySync:
         # 界面层：训练一次
         page = TrainingPage()
         page.set_data(player, club)
+        career_sys.advance_days(player, 3, club=club)  # 到非比赛日再训练
         page._on_start()
-        # 训练后推进 6 天到下一个比赛日（一周一赛），再比赛
-        career_sys.advance_days(player, 6, club=club)
+        # 训练后推进到下一个比赛日（一周一赛），再比赛
+        career_sys.advance_days(player, 3, club=club)
         # 界面层：比赛一次
         match_page = MatchPage()
         match_page.set_data(player, club, matches)
@@ -245,7 +277,8 @@ class TestThreeWaySync:
         handle_event(player, event, "B")
 
         # 模型层：主仪表盘刷新后显示一致
-        dashboard = MainWindow().dashboard
+        window = MainWindow()
+        dashboard = window.dashboard
         dashboard.set_data(player, club, matches)
         assert dashboard.player.money == player.money
         assert dashboard.matches == matches
